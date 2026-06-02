@@ -1,5 +1,9 @@
 // DO クラスを re-export
-export { MyDurableObject } from "./mydo.js";
+export { CounterDurableObject } from "./counter_do";
+
+type CounterWorkerEnv = Env & {
+	COUNTER_DURABLE_OBJECT: DurableObjectNamespace<import("./counter_do").CounterDurableObject>;
+};
 
 /**
  * Welcome to Cloudflare Workers! This is your first Durable Objects application.
@@ -23,18 +27,26 @@ export default {
 	 * @param ctx - The execution context of the Worker
 	 * @returns The response to be sent back to the client
 	 */
-	async fetch(request, env, _ctx): Promise<Response> {
-		// Create a stub to open a communication channel with the Durable Object
-		// instance named "foo".
-		//
-		// Requests from all Workers to the Durable Object instance named "foo"
-		// will go to a single remote Durable Object instance.
-		const stub = env.MY_DURABLE_OBJECT.getByName("foo");
+	async fetch(request, env: CounterWorkerEnv, _ctx): Promise<Response> {
+		const url = new URL(request.url);
 
-		// Call the `sayHello()` RPC method on the stub to invoke the method on
-		// the remote Durable Object instance.
-		const greeting = await stub.sayHello("world");
-
-		return new Response(greeting);
+		switch (url.pathname) {
+			case "/message":
+				const stub = env.COUNTER_DURABLE_OBJECT.getByName("bar");
+				const nextCount = await stub.increment();
+				return new Response(`Counter 'bar' count: ${nextCount}`);
+			case "/value": {
+				const stub = env.COUNTER_DURABLE_OBJECT.getByName("bar");
+				const value = await stub.getValue();
+				return Response.json({ value });
+			}
+			case "/reset": {
+				const stub = env.COUNTER_DURABLE_OBJECT.getByName("bar");
+				const value = await stub.reset();
+				return Response.json({ value });
+			}
+			default:
+				return new Response("Not Found", { status: 404 });
+		}
 	},
 } satisfies ExportedHandler<Env>;

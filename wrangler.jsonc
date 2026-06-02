@@ -12,6 +12,10 @@
 			"new_sqlite_classes": ["MyDurableObject"],
 			"tag": "v1",
 		},
+		{
+			"new_sqlite_classes": ["CounterDurableObject"],
+			"tag": "v2",
+		},
 	],
 	"assets": {
 		// The path to the directory containing the `index.html` file to be served at `/`
@@ -20,11 +24,17 @@
 	"durable_objects": {
 		"bindings": [
 			{
-				"class_name": "MyDurableObject",
-				"name": "MY_DURABLE_OBJECT",
+				"class_name": "CounterDurableObject",
+				"name": "COUNTER_DURABLE_OBJECT",
 			},
 		],
 	},
+	"kv_namespaces": [
+		{
+			"binding": "COUNTER_KV",
+			"id": "00000000000000000000000000000000",
+		},
+	],
 	"observability": {
 		"enabled": true,
 	},
