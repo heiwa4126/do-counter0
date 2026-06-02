@@ -1,14 +1,8 @@
 import { DurableObject } from "cloudflare:workers";
 
-type CounterEnv = Env & {
-	COUNTER_KV: KVNamespace;
-};
-
 /** A Durable Object's behavior is defined in an exported Javascript class */
 export class CounterDurableObject extends DurableObject {
-	private static readonly COUNTER_KEY = "counter:bar";
-	private readonly appEnv: CounterEnv;
-	private readonly ready: Promise<void>;
+	private static readonly COUNTER_KEY = "counter";
 	private count = 0;
 
 	/**
@@ -20,57 +14,44 @@ export class CounterDurableObject extends DurableObject {
 	 */
 	constructor(ctx: DurableObjectState, env: Env) {
 		super(ctx, env);
-		this.appEnv = env as CounterEnv;
-		this.ready = this.ctx.blockConcurrencyWhile(async () => {
-			this.count = await this.readCountFromKv();
+		this.ctx.blockConcurrencyWhile(async () => {
+			this.count = await this.readCountFromStorage();
 		});
 	}
 
 	async getValue(): Promise<number> {
-		await this.ready;
 		return this.count;
 	}
 
 	async increment(step = 1): Promise<number> {
-		await this.ready;
 		const next = this.count + step;
-		if (next !== this.count) {
-			this.count = next;
-			await this.writeCountToKv(next);
-		}
+		this.count = next;
+		await this.writeCountToStorage(next);
 		return next;
 	}
 
 	async decrement(step = 1): Promise<number> {
-		await this.ready;
 		const next = this.count - step;
-		if (next !== this.count) {
-			this.count = next;
-			await this.writeCountToKv(next);
-		}
+		this.count = next;
+		await this.writeCountToStorage(next);
 		return next;
 	}
 
 	async reset(): Promise<number> {
-		await this.ready;
-		if (this.count !== 0) {
-			this.count = 0;
-			await this.writeCountToKv(0);
-		}
+		this.count = 0;
+		await this.writeCountToStorage(0);
 		return 0;
 	}
 
-	private async readCountFromKv(): Promise<number> {
-		const stored = await this.appEnv.COUNTER_KV.get(CounterDurableObject.COUNTER_KEY);
-		if (stored === null) {
+	private async readCountFromStorage(): Promise<number> {
+		const stored = await this.ctx.storage.get<number>(CounterDurableObject.COUNTER_KEY);
+		if (stored === undefined) {
 			return 0;
 		}
-
-		const parsed = Number.parseInt(stored, 10);
-		return Number.isNaN(parsed) ? 0 : parsed;
+		return stored;
 	}
 
-	private async writeCountToKv(value: number): Promise<void> {
-		await this.appEnv.COUNTER_KV.put(CounterDurableObject.COUNTER_KEY, String(value));
+	private async writeCountToStorage(value: number): Promise<void> {
+		await this.ctx.storage.put(CounterDurableObject.COUNTER_KEY, value);
 	}
 }

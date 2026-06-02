@@ -1,9 +1,6 @@
 // DO クラスを re-export
 export { CounterDurableObject } from "./counter_do";
-
-type CounterWorkerEnv = Env & {
-	COUNTER_DURABLE_OBJECT: DurableObjectNamespace<import("./counter_do").CounterDurableObject>;
-};
+export { MyDurableObject } from "./my_do";
 
 /**
  * Welcome to Cloudflare Workers! This is your first Durable Objects application.
@@ -27,23 +24,29 @@ export default {
 	 * @param ctx - The execution context of the Worker
 	 * @returns The response to be sent back to the client
 	 */
-	async fetch(request, env: CounterWorkerEnv, _ctx): Promise<Response> {
+	async fetch(request, env, _ctx): Promise<Response> {
 		const url = new URL(request.url);
+		const COUNTER_NAME = "bar";
 
 		switch (url.pathname) {
 			case "/message":
-				const stub = env.COUNTER_DURABLE_OBJECT.getByName("bar");
-				const nextCount = await stub.increment();
-				return new Response(`Counter 'bar' count: ${nextCount}`);
+				const stub = env.MY_DURABLE_OBJECT.getByName("foo");
+				const greeting = await stub.sayHello("world");
+				return new Response(greeting);
+			case "/increment": {
+				const stub = env.COUNTER_DURABLE_OBJECT.getByName(COUNTER_NAME);
+				const value = await stub.increment();
+				return new Response(value.toString());
+			}
 			case "/value": {
-				const stub = env.COUNTER_DURABLE_OBJECT.getByName("bar");
+				const stub = env.COUNTER_DURABLE_OBJECT.getByName(COUNTER_NAME);
 				const value = await stub.getValue();
-				return Response.json({ value });
+				return new Response(value.toString());
 			}
 			case "/reset": {
-				const stub = env.COUNTER_DURABLE_OBJECT.getByName("bar");
+				const stub = env.COUNTER_DURABLE_OBJECT.getByName(COUNTER_NAME);
 				const value = await stub.reset();
-				return Response.json({ value });
+				return new Response(value.toString());
 			}
 			default:
 				return new Response("Not Found", { status: 404 });

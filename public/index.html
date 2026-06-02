@@ -12,13 +12,10 @@
 			`wrangler.jsonc`.
 		</p>
 		<div id="message">*</div>
-		<script>
-			fetch("/message")
-				.then((resp) => resp.text())
-				.then((text) => {
-					const messageDiv = document.getElementById("message");
-					messageDiv.textContent = text;
-				});
-		</script>
+		<p>
+			Access counter: <span id="counter">*</span>
+			<button id="reset-button" type="button">Reset counter</button>
+		</p>
+		<script src="./test.js"></script>
 	</body>
 </html>
