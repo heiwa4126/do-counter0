@@ -25,6 +25,9 @@ export class CounterDurableObject extends DurableObject {
 
 	async increment(step = 1): Promise<number> {
 		const next = this.count + step;
+		// await をまたいでも"今回計算した値"を固定して扱えるように、
+		// 先に next を計算してから await する。
+		// この規模なら不要なんだけど拡張を考えて
 		this.count = next;
 		await this.writeCountToStorage(next);
 		return next;
