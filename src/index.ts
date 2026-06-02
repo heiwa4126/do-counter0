@@ -2,6 +2,20 @@
 export { CounterDurableObject } from "./counter_do";
 export { MyDurableObject } from "./my_do";
 
+// ヘルパー関数: テキストプレーンのレスポンスを生成
+function textPlainResponse(value: string | number, status = 200): Response {
+	const body = String(value);
+	const contentLength = new TextEncoder().encode(body).length.toString();
+
+	return new Response(body, {
+		status,
+		headers: {
+			"content-type": "text/plain; charset=utf-8",
+			"content-length": contentLength,
+		},
+	});
+}
+
 /**
  * Welcome to Cloudflare Workers! This is your first Durable Objects application.
  *
@@ -32,24 +46,24 @@ export default {
 			case "/message":
 				const stub = env.MY_DURABLE_OBJECT.getByName("foo");
 				const greeting = await stub.sayHello("world");
-				return new Response(greeting);
+				return textPlainResponse(greeting);
 			case "/increment": {
 				const stub = env.COUNTER_DURABLE_OBJECT.getByName(COUNTER_NAME);
 				const value = await stub.increment();
-				return new Response(value.toString());
+				return textPlainResponse(value);
 			}
 			case "/value": {
 				const stub = env.COUNTER_DURABLE_OBJECT.getByName(COUNTER_NAME);
 				const value = await stub.getValue();
-				return new Response(value.toString());
+				return textPlainResponse(value);
 			}
 			case "/reset": {
 				const stub = env.COUNTER_DURABLE_OBJECT.getByName(COUNTER_NAME);
 				const value = await stub.reset();
-				return new Response(value.toString());
+				return textPlainResponse(value);
 			}
 			default:
-				return new Response("Not Found", { status: 404 });
+				return textPlainResponse("Not Found", 404);
 		}
 	},
 } satisfies ExportedHandler<Env>;

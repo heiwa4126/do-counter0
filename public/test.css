@@ -1,0 +1,19 @@
+#counter {
+	display: inline-flex;
+	align-items: center;
+	background: #000;
+	background: linear-gradient(to bottom, black 0%, #444 25%, #111 80%, black 100%);
+	color: #fff;
+	padding: 2px 0;
+	line-height: 1.2;
+}
+
+#counter .digit {
+	display: inline-block;
+	padding: 2px 3px;
+	border-right: 1px solid #888;
+}
+
+#counter .digit:last-child {
+	border-right: 0;
+}
