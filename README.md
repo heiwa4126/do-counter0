@@ -17,9 +17,11 @@ pnpm dev
 これで <http://localhost:8787> で動作確認。
 
 コード構成を変更したら
+
 ```sh
 pnpm run cf-typegen
 ```
+
 で `worker-configuration.d.ts` を作り直すのを忘れないこと。
 
 そこそこできたら
@@ -29,3 +31,12 @@ pnpm run deploy
 ```
 
 認可は自分は TOKEN を使ってますが `pnpm exec wrangler login` でもいいです。
+
+## 重要: プレビューURL
+
+> Preview URLs are not generated for Workers that use Durable Objects.  
+> (Durable Objects を使用しているWorkerではプレビューURLが生成されません)
+
+<https://developers.cloudflare.com/changelog/post/2025-07-23-workers-preview-urls/#limitations-while-in-beta>
+
+なので、このプロジェクトは2本立てに変える予定。
