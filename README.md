@@ -16,14 +16,6 @@ pnpm dev
 
 これで <http://localhost:8787> で動作確認。
 
-コード構成を変更したら
-
-```sh
-pnpm run cf-typegen
-```
-
-で `worker-configuration.d.ts` を作り直すのを忘れないこと。
-
 そこそこできたら
 
 ```sh
