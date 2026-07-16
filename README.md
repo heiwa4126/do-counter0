@@ -19,10 +19,9 @@ pnpm dev
 そこそこできたら
 
 ```sh
+pnpm run login
 pnpm run deploy
 ```
-
-認可は自分は TOKEN を使ってますが `pnpm exec wrangler login` でもいいです。
 
 ## 重要: プレビューURL
 
@@ -31,4 +30,4 @@ pnpm run deploy
 
 <https://developers.cloudflare.com/changelog/post/2025-07-23-workers-preview-urls/#limitations-while-in-beta>
 
-なので、このプロジェクトは2本立てに変える予定。
+なので、このプロジェクトは 2 本立てに変える予定。

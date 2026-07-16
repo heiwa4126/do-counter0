@@ -10,6 +10,7 @@
 		"upload": "wrangler versions upload",
 		"preview": "wrangler versions upload",
 		"release": "wrangler versions deploy",
+		"login": "wrangler login --browser false",
 		"cf-typegen": "wrangler types",
 		"format": "oxfmt",
 		"lint": "oxlint",
