@@ -11,8 +11,8 @@ function textPlainResponse(value: string | number, status = 200): Response {
 		status,
 		headers: {
 			"content-type": "text/plain; charset=utf-8",
-			"content-length": contentLength,
-		},
+			"content-length": contentLength
+		}
 	});
 }
 
@@ -65,5 +65,5 @@ export default {
 			default:
 				return textPlainResponse("Not Found", 404);
 		}
-	},
+	}
 } satisfies ExportedHandler<Env>;
